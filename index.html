@@ -1,67 +1,194 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Licencias & Claves</title>
-    <style>
-        body{font-family: Arial, Helvetica, sans-serif;background:#f5f5f5;margin:0;padding:20px}
-        h1{color:#333}
-        table{border-collapse:collapse;width:100%;max-width:800px;background:#fff}
-        th,td{border:1px solid #ccc;padding:8px;text-align:left}
-        th{background:#eee}
-        caption{caption-side:bottom;text-align:left;font-size:.9em;color:#555;padding-top:4px}
+<meta charset="UTF-8" />
+<title>Sistema médico – Pantalla de muerte</title>
+<style>
+    /* --------- Ajustes generales -------- */
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
+    body{width:100vw;height:100vh;overflow:hidden;background:rgba(130,0,0,.25);color:#fff;animation:screenFade .8s ease-out forwards;-webkit-user-select:none;user-select:none;}
+
+    /* --------- Vignette / sangrado rojo -------- */
+    body::before{
+        content:"";
+        position:fixed;inset:0;
+        background:radial-gradient(ellipse at center, transparent 40%, rgba(130,0,0,.25)),
+                   radial-gradient(circle at top left, rgba(130,0,0,.15), transparent 60%),
+                   radial-gradient(circle at top right, rgba(130,0,0,.1), transparent 60%),
+                   radial-gradient(circle at bottom left, rgba(130,0,0,.1), transparent 60%),
+                   radial-gradient(circle at bottom right, rgba(130,0,0,.15), transparent 60%);
+        pointer-events:none;animation:heartbeat 2s infinite;
+    }
+
+    /* --------- Logo arriba-izquierda -------- */
+    .logo{
+        position:fixed;top:16px;left:24px;
+        font-size:32px;font-weight:800;color:#ffffff;
+        text-shadow:2px 2px 4px #000,0 0 8px #fff,0 0 14px #fff;
+    }
+
+    /* --------- Mensaje superior -------- */
+    .respawn{
+        position:fixed;top:20px;left:50%;transform:translateX(-50%);
+        font-size:26px;font-weight:700;letter-spacing:.5px;
+    }
+    .respawn span.key{
+        display:inline-block;
+        padding:2px 8px;
+        margin:0 4px;
+        background:#fff;color:#000;
+        border-radius:4px;font-weight:900;
+    }
+
+    /* --------- Cuadro lateral “Info” -------- */
+    .info-box{
+        position:fixed;top:80px;left:24px;
+        width:165px;background:rgba(0,0,0,.75);border-radius:6px;
+        padding:10px 14px;border:1px solid rgb(255, 0, 0);
+    }
+    .info-box h4{color:rgb(255, 0, 0);margin-bottom:6px;font-size:16px;}
+    .info-box p{font-size:13px;line-height:1.2;}
+
+    .progress-bar{
+        height:4px;background:rgb(255, 0, 0);margin-top:8px;border-radius:2px;
+        animation:drain 10s linear forwards;
+    }
+    @keyframes drain{from{width:100%}to{width:0%}}
+
+/* animación de aparición */
+@keyframes screenFade{
+    from{opacity:0}
+    to{opacity:1}
+}
+
+/* animación de aparición de bloque muerto */
+@keyframes deadPop{
+    0%{transform:translateX(-50%) scale(.8);opacity:0}
+    70%{transform:translateX(-50%) scale(1.05);opacity:1}
+    100%{transform:translateX(-50%) scale(1);opacity:1}
+}
+
+/* latido leve en overlay */
+@keyframes heartbeat{
+    0%{opacity:.25}
+    50%{opacity:.35}
+    100%{opacity:.25}
+}
+
+
+    /* --------- Mensaje central -------- */
+    .center-wrapper{
+        position:fixed;bottom:8%;left:50%;
+        transform:translateX(-50%) scale(.65);
+        text-align:center;
+        opacity:0;
+        animation:deadPop .9s cubic-bezier(.4,1.4,.6,1) forwards;
+    }
+    .center-wrapper h1{
+        font-size:30px;color:#ff0000;margin-bottom:8px;
+        text-shadow:3px 3px 6px #272727,0 0 8px rgba(255, 129, 129, 0.582),0 0 16px #ffffff8f;
+    }
+    .center-wrapper h2{
+        font-size:13px;font-weight:400;margin-bottom:20px;
+    }
+    /* --------- Estado y cronómetro -------- */
+    .status{font-size:15px;margin-bottom:10px;}
+    .timer{
+        display:flex;gap:8px;justify-content:center;
+    }
+    .timer .box{
+        width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+        background:#303030b6;border:2px solid #fff;border-radius:4px;
+        font-size:18px;font-weight:700;
+    }
+    .timer .colon{
+        display:flex;align-items:center;justify-content:center;
+        font-size:22px;font-weight:700;min-width:18px;
+    }
     </style>
+    <script>document.addEventListener('contextmenu',e=>e.preventDefault());</script>
 </head>
 <body>
-    <h1>Listado de licencias, keys e IPs</h1>
 
-    <!--
-        EDITA LOS DATOS FÁCILMENTE:
-        1. Copia la línea de ejemplo del array de abajo y pega tantas entradas como necesites.
-        2. Cambia los valores "license", "key" e "ip".
-        3. Guarda este archivo.
-        Tu script de MTA podrá leer estos datos usando fetchRemote y decodificando el JSON.
-    -->
-    <script id="licenseData" type="application/json">
-    [
-        {
-            "license": "LIC001",
-            "key": "KEY123456",
-            "ip": "127.0.0.1"
-        },
-        {
-            "license": "LIC002",
-            "key": "KEY123457",
-            "ip": "127.0.0.2"
-        }
-    ]
-    </script>
 
-    <table id="visual-table">
-        <thead>
-            <tr>
-                <th>Licencia</th>
-                <th>Key</th>
-                <th>IP</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <caption>Modifica este archivo para añadir o eliminar registros.</caption>
+
+    <!-- Instrucción para renacer -->
+    <div class="respawn" style="display:none">
+        Presione <span class="key">R</span> Para Renacer
+    </div>
+
+    <!-- Mensaje central -->
+    <div class="center-wrapper">
+        <h1>TE ESTÁS MURIENDO</h1>
+        <h2 id="helpMsg">Presiona R para solicitar servicios de emergencia</h2>
+
+        <div class="status">Desangrándose</div>
+
+        <div class="timer">
+            <div class="box" id="minT">0</div>
+            <div class="box" id="minU">0</div>
+            <div class="colon">:</div>
+            <div class="box" id="secT">0</div>
+            <div class="box" id="secU">0</div>
+        </div> <!-- Timer con IDs -->
+    </div>
 
     <script>
-        // Muestra el JSON en la tabla para que sea legible en el navegador
-        try{
-            const data = JSON.parse(document.getElementById('licenseData').textContent);
-            const tbody = document.querySelector('#visual-table tbody');
-            data.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${r.license}</td><td>${r.key}</td><td>${r.ip}</td>`;
-                tbody.appendChild(tr);
+        document.addEventListener('DOMContentLoaded', () => {
+            const minT = document.getElementById('minT');
+            const minU = document.getElementById('minU');
+            const secT = document.getElementById('secT');
+            const secU = document.getElementById('secU');
+            const respawnDiv = document.querySelector('.respawn');
+            const statusDiv  = document.querySelector('.status');
+
+            // Fase 1: 5 segundos sin posibilidad de renacer
+            let phase = 1; // 1 = cooldown inicial, 2 = ventana para renacer
+            let remaining = 600; // 5 segundos
+
+            function updateDigits(){
+                const m = Math.floor(remaining / 60);
+                const s = remaining % 60;
+                minT.textContent = Math.floor(m / 10);
+                minU.textContent = m % 10;
+                secT.textContent = Math.floor(s / 10);
+                secU.textContent = s % 10;
+            }
+
+            updateDigits();
+
+            const interval = setInterval(() => {
+                if (remaining <= 0){
+                    if (phase === 1){
+                        // Pasar a fase 2
+                        phase = 2;
+                        remaining = 20 * 60; // 20 minutos disponibles para renacer
+                        respawnDiv.style.display = 'block';
+                        statusDiv.textContent = 'Puedes renacer';
+                        updateDigits();
+                    } else {
+                        // Fase 2 terminada, detener timer
+                        clearInterval(interval);
+                        return;
+                    }
+                } else {
+                    remaining--;
+                    updateDigits();
+                }
+            }, 1000);
+
+            // Detectar tecla E para solicitud de servicio
+            let requestSent = false;
+            document.addEventListener('keydown', (ev) => {
+                if (requestSent) return;
+                if ((ev.key === 'e' || ev.key === 'E')) {
+                    const help = document.getElementById('helpMsg');
+                    if (help) help.textContent = 'Envieaste una Solicitud de servicio';
+                    requestSent = true;
+                }
             });
-        }catch(e){console.error('JSON inválido en licenseData', e);}
+
+        });
     </script>
 </body>
 </html>
