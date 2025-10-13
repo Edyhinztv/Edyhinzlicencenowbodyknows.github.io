@@ -6,39 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Licencias & Claves</title>
     <style>
-        body{font-family: Arial, Helvetica, sans-serif;background:#121212;color:#eee;margin:0;padding:20px;display:flex;flex-direction:column;align-items:center}
-        h1{color:#fff}
-        table{border-collapse:collapse;width:100%;max-width:800px;background:#1e1e1e;margin:0 auto}
-        th,td{border:1px solid #333;padding:8px;text-align:left;color:#eee}
-        th{background:#272727}
-        caption{caption-side:bottom;text-align:center;font-size:.9em;color:#aaa;padding-top:4px}
-
-        /* Inputs & buttons */
-        input{background:#1e1e1e;color:#eee;border:1px solid #333;padding:6px 8px;margin-right:6px;border-radius:4px}
-        button{background:#272727;color:#eee;border:none;padding:6px 12px;border-radius:4px}
-        button:hover{background:#333}
-        /* Modal */
-        #confirm-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9999}
-        #confirm-box{background:#fff;padding:20px 30px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);text-align:center}
-        #confirm-box p{color:#000;font-weight:bold}
-        /* Login Overlay */
-        #login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:10000}
-        #login-box{background:#1e1e1e;padding:30px 40px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.5);text-align:center}
-        #login-box input{background:#272727;color:#eee;border:1px solid #444;padding:8px 10px;border-radius:4px;width:200px;margin-top:10px}
-        #login-box button{background:#444;color:#eee;border:none;padding:6px 14px;border-radius:4px;margin-top:15px;cursor:pointer}
-        #login-box button:hover{background:#555}
-        #confirm-box button{margin:10px 15px;padding:6px 14px;cursor:pointer}
+        body{font-family: Arial, Helvetica, sans-serif;background:#f5f5f5;margin:0;padding:20px}
+        h1{color:#333}
+        table{border-collapse:collapse;width:100%;max-width:800px;background:#fff}
+        th,td{border:1px solid #ccc;padding:8px;text-align:left}
+        th{background:#eee}
+        caption{caption-side:bottom;text-align:left;font-size:.9em;color:#555;padding-top:4px}
     </style>
 </head>
 <body>
     <h1>Listado de licencias, keys e IPs</h1>
-
-    <form id="add-form" style="margin:20px 0;">
-        <input type="text" id="lic" placeholder="Licencia">
-        <input type="text" id="key" placeholder="Key">
-        <input type="text" id="ip" placeholder="IP" required>
-        <button type="submit">Añadir</button>
-    </form>
 
     <!--
         EDITA LOS DATOS FÁCILMENTE:
@@ -49,7 +26,16 @@
     -->
     <script id="licenseData" type="application/json">
     [
-
+        {
+            "license": "LIC001",
+            "key": "KEY123456",
+            "ip": "127.0.0.1"
+        },
+        {
+            "license": "LIC002",
+            "key": "KEY123457",
+            "ip": "127.0.0.2"
+        }
     ]
     </script>
 
@@ -59,118 +45,23 @@
                 <th>Licencia</th>
                 <th>Key</th>
                 <th>IP</th>
-                <th>Acción</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
     <caption>Modifica este archivo para añadir o eliminar registros.</caption>
 
-    <!-- Login -->
-    <div id="login-overlay">
-        <div id="login-box">
-            <h2>Panel Admin</h2>
-            <input type="password" id="login-pass" placeholder="Contraseña">
-            <br>
-            <button id="login-submit">Entrar</button>
-            <p id="login-info" style="color:#f55;display:none;margin-top:10px;">Contraseña incorrecta</p>
-        </div>
-    </div>
-
-    <!-- Confirmación personalizada -->
-    <div id="confirm-overlay">
-        <div id="confirm-box">
-            <p id="confirm-msg">¿Seguro que deseas eliminar?</p>
-            <button id="confirm-yes">Sí</button>
-            <button id="confirm-no">No</button>
-        </div>
-    </div>
-
     <script>
         // Muestra el JSON en la tabla para que sea legible en el navegador
         try{
-            let data = JSON.parse(localStorage.getItem('licenseData') || document.getElementById('licenseData').textContent);
+            const data = JSON.parse(document.getElementById('licenseData').textContent);
             const tbody = document.querySelector('#visual-table tbody');
             data.forEach(r => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td>${r.license}</td><td>${r.key}</td><td>${r.ip}</td><td><button class="del">Eliminar</button></td>`;
+                tr.innerHTML = `<td>${r.license}</td><td>${r.key}</td><td>${r.ip}</td>`;
                 tbody.appendChild(tr);
             });
-
-        // Formulario para añadir nuevas entradas
-        document.getElementById('add-form').addEventListener('submit', function(e){
-            e.preventDefault();
-            let license = document.getElementById('lic').value.trim();
-            let keyVal = document.getElementById('key').value.trim();
-            const ip = document.getElementById('ip').value.trim();
-
-            // Generar aleatorios si están vacíos
-            if(!license) license = 'LIC'+Math.floor(Math.random()*1e6).toString().padStart(6,'0');
-            if(!keyVal) keyVal = 'KEY'+Math.random().toString(36).substring(2,10).toUpperCase();
-
-            // Validar IP formato 0-255.0-255.0-255.0-255
-            const ipOk = /^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip);
-            if(!ipOk){
-                alert('IP inválida. Usa el formato 102.129.137.90');
-                return;
-            }
-            const obj = {license, key: keyVal, ip};
-            data.push(obj);
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${obj.license}</td><td>${obj.key}</td><td>${obj.ip}</td><td><button class="del">Eliminar</button></td>`;
-            tbody.appendChild(tr);
-
-            // Actualizar el bloque JSON visible para persistencia rápida
-            document.getElementById('licenseData').textContent = JSON.stringify(data, null, 4);
-            localStorage.setItem('licenseData', JSON.stringify(data));
-            this.reset();
-        });
-        
-        // Delegado para eliminar registros
-        tbody.addEventListener('click', function(e){
-            if(e.target.classList.contains('del')){
-                const row = e.target.closest('tr');
-                const lic = row.children[0].textContent;
-                pendingRow = row;
-                pendingLic = lic;
-                document.getElementById('confirm-msg').textContent = `¿Eliminar la licencia ${lic}?`;
-                document.getElementById('confirm-overlay').style.display='flex';
-            }
-        });
-
-        // Variables para confirmar borrado
-        let pendingRow=null, pendingLic="";
-        document.getElementById('confirm-yes').addEventListener('click',()=>{
-            if(pendingRow){
-                data = data.filter(item => item.license !== pendingLic);
-                pendingRow.remove();
-                document.getElementById('licenseData').textContent = JSON.stringify(data, null, 4);
-                localStorage.setItem('licenseData', JSON.stringify(data));
-            }
-            document.getElementById('confirm-overlay').style.display='none';
-        });
-        document.getElementById('confirm-no').addEventListener('click',()=>{
-            document.getElementById('confirm-overlay').style.display='none';
-            pendingRow=null;
-        });
-
-        // Login handler (fuera del listener de confirm-no)
-        const ADMIN_PASS = 'S7^bZ!xP2@kL9q#rVw3t';
-        document.getElementById('login-submit').addEventListener('click', ()=>{
-            const v = document.getElementById('login-pass').value.trim();
-            const info = document.getElementById('login-info');
-            if(v===ADMIN_PASS){
-                document.getElementById('login-overlay').style.display='none';
-                info.style.display='none';
-            }else{
-                info.style.display='block';
-            }
-        });
-        document.getElementById('login-pass').addEventListener('keyup', (e)=>{
-            if(e.key==='Enter') document.getElementById('login-submit').click();
-        });
-        }catch(e){console.error('JSON inválido en licenseData', e);} 
+        }catch(e){console.error('JSON inválido en licenseData', e);}
     </script>
 </body>
 </html>
