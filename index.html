@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>[Edy]Web</title>
+    <style>
+        /* General page reset */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: #0d0d0d; /* Almost-black background as shown in the screenshot */
+            color: #ffffff;      /* Pure white text for high contrast */
+            font-family: "Courier New", Courier, monospace; /* Monospace font to mimic code style */
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Container keeps the text away from the very edge */
+        .wrapper {
+            padding: 12px 16px;
+        }
+
+        /* Each logical block (--- title { ... }) */
+        .block {
+            margin-bottom: 20px;
+        }
+
+        .block-title {
+            font-weight: 700; /* Bold */
+        }
+
+        .brace,
+        .kv {
+            margin-left: 12px;
+        }
+
+        .kv {
+            margin-left: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- First block -->
+        <div class="block">
+            <div class="block-title">--- flow latin</div>
+            <div class="brace">{</div>
+            <div class="kv">licence = "k2320393"</div>
+            <div class="kv">key = "k2320393"</div>
+            <div class="kv">ip = "127.0.0.1"</div>
+            <div class="brace">},</div>
+        </div>
+
+        <!-- Second block -->
+        <div class="block">
+            <div class="block-title">--- Underwater</div>
+            <div class="brace">{</div>
+            <div class="kv">licence = "k2320393"</div>
+            <div class="kv">key = "k2320393"</div>
+            <div class="kv">ip = "127.0.0.1"</div>
+            <div class="brace">}</div>
+        </div>
+    </div>
+</body>
+</html>
