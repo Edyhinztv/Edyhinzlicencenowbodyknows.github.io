@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licencias & Claves</title>
+    <style>
+        body{font-family: Arial, Helvetica, sans-serif;background:#f5f5f5;margin:0;padding:20px}
+        h1{color:#333}
+        table{border-collapse:collapse;width:100%;max-width:800px;background:#fff}
+        th,td{border:1px solid #ccc;padding:8px;text-align:left}
+        th{background:#eee}
+        caption{caption-side:bottom;text-align:left;font-size:.9em;color:#555;padding-top:4px}
+    </style>
+</head>
+<body>
+    <h1>Listado de licencias, keys e IPs</h1>
+
+    <!--
+        EDITA LOS DATOS FÁCILMENTE:
+        1. Copia la línea de ejemplo del array de abajo y pega tantas entradas como necesites.
+        2. Cambia los valores "license", "key" e "ip".
+        3. Guarda este archivo.
+        Tu script de MTA podrá leer estos datos usando fetchRemote y decodificando el JSON.
+    -->
+    <script id="licenseData" type="application/json">
+    [
+        {
+            "license": "LIC001",
+            "key": "KEY123456",
+            "ip": "127.0.0.1"
+        },
+        {
+            "license": "LIC002",
+            "key": "KEY123457",
+            "ip": "127.0.0.2"
+        }
+    ]
+    </script>
+
+    <table id="visual-table">
+        <thead>
+            <tr>
+                <th>Licencia</th>
+                <th>Key</th>
+                <th>IP</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <caption>Modifica este archivo para añadir o eliminar registros.</caption>
+
+    <script>
+        // Muestra el JSON en la tabla para que sea legible en el navegador
+        try{
+            const data = JSON.parse(document.getElementById('licenseData').textContent);
+            const tbody = document.querySelector('#visual-table tbody');
+            data.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${r.license}</td><td>${r.key}</td><td>${r.ip}</td>`;
+                tbody.appendChild(tr);
+            });
+        }catch(e){console.error('JSON inválido en licenseData', e);}
+    </script>
+</body>
+</html>
